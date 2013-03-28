@@ -14,56 +14,5 @@ Default options for the class can be set directly on the class itself, inherited
 
 
 == Examples: ==
-
-
-=== Instantiation: ===
-
-// Instantiate a new DataBridge object using the local language constructs:
-$db = new DataBridge(array(
-  'host' => 'host_uri',  // Defaults to whatever the preferred context may be. Could be 'localhost', './', 'http://...'.
-  'data' => 'data_source',  // Typically a database name, but could also be any number of other options.
-  'user' => 'user',  // The user authentication identifier to be used to reference access privilages, if applicable. 
-  'pass' => 'pass'  // The authentication password used for the user, if applicable.
-));
-
-// Which obviously could actually look like this:
-$db = new DataBridge(array('host'=>$Host,'data=>$Data,'user'=>$User,'pass':$Pass));  // Or whatever...
-
-
-// Instantiate a new DataBridge object using a JSON string:
-$db = new DataBridge('{
-  "host" : "host_uri",
-  "data" : "data_source",
-  "user" : "user",
-  "pass" : "pass"
-}');
-
-// Which obviously could actually look like this:
-$db = new DataBridge('{"host":"{{host}}","data":"{{data}}","user":"{{user}}","pass":"{{pass}}"}');  // Or whatever...
-
-
-=== Access: ===
-// Obtain data from an authenticated DataBridge object instance. Compare to the to the following SQL statement:
-SELECT "field1", "field2", "field3", "field4"
-    FROM "table"
-    WHERE "field1"="filterVal",
-      "field2" >= "filterVal",
-      "field3" < "filterVal",
-      "field4" != "filterVal"
-    ORDER BY "field1", "field2", "field3", "field4";
-
-
-// Typical standard usage.
-$db->Get('{
-  "table" : {
-    "field1" : "filterVal",
-    "field2" : ">=filterVal",
-    "field3" : "<filterVal",
-    "field4" : "!filterVal"
-  }
-}');
-
-
-
-
+Check out the wiki for usage examples: https://github.com/jtrick/DataBridge/wiki
 
