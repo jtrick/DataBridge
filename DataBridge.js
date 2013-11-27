@@ -1,11 +1,10 @@
 
-
 (function _DataBridge(){  // Encapsulate scope
 
 
 // The js version of the DataBridge object. Pass object parameters as {host:host,data:data,user:user,pass:pass}
 function DataBridge(obj) {
-	obj = jsonToObj(obj);
+	if (!(obj=jsonToObj(obj)) { return; }
 	var host = obj.host || 'local',  // Defaults to whatever the preferred context may be. Could be 'localhost', './', 'http://...'.
 		data = obj.data || 'default',  // Typically a database name, but could also be any number of other options.
 		user = obj.user || 'default',  // The user authentication identifier to be used to reference access privilages, if applicable. 
