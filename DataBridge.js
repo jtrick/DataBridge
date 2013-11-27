@@ -1,28 +1,94 @@
 
 
+(function _DataBridge(){  // Encapsulate scope
+
+
+// The js version of the DataBridge object. Pass object parameters as {host:host,data:data,user:user,pass:pass}
 function DataBridge(obj) {
-	obj = 
-	var host = obj.host || 'local',
-		data = obj.data || 'default',
-		data = obj.data || 'default',
-		data = obj.data || 'default';
+	obj = jsonToObj(obj);
+	var host = obj.host || 'local',  // Defaults to whatever the preferred context may be. Could be 'localhost', './', 'http://...'.
+		data = obj.data || 'default',  // Typically a database name, but could also be any number of other options.
+		user = obj.user || 'default',  // The user authentication identifier to be used to reference access privilages, if applicable. 
+		pass = obj.pass || 'default',  // The authentication password used for the user, if applicable.
+		type = obj.type || 'mongo';  // If specifying a database type. Would typically be inferred from other data?
+	
+	// ... Authenticate and instantiate correct database type.
+	
+	
+	function MongoDb() {
+		var _this = this;
 		
-}
+		_api = {
+			'get': function() {
+			
+			},
+			'set': function() {
+			
+			},
+			'add': function() {
+			
+			},
+			'rem': function() {
+			
+			},
+			'new': function() {
+			
+			},
+			'del': function() {
+			
+			},
+			'exe': function() {
+			
+			}
+		};
+	}//MongoDb
+	
+}//DataBridge
+
+
+
+// *******  Utility Functions:  ************************************************************* //
 
 
 
 // Performs basic checks for JSON structure and returns the extracted object if applicable, returns the original string otherwise.
 function jsonToObj(str) {
-	if (!$.isString(str)) { return str; }
-	// Fix. Complete these checks.
-	var obj = JSON.parse(str);
-	return $.isPlainObject(obj) ? obj : str;
+	if (!is(str,'str')) { return str; }
+	var b = str.charAt(0),
+		e = str.charAt(str.length-1),
+		obj;
+	// Fix. Complete these checks:
+	// if (!(b=='{'&&e=='}')&&!(b=='['&&e==']')) { return; }
+	if (b=='[' && e==']') { 
+		obj = JSON.parse('{"tmp":'+str+'}');
+		if (obj && obj.tmp) { return obj.tmp; }
+		return;  // flagError('Invalid JSON str', str);
+	} else if (b=='{' && e=='}') { 
+		obj = JSON.parse(str);
+	} else { 
+		return;  // flagError('Invalid JSON str', str);
+	}
+	return is(obj,'obj') ? obj : str;
 }
 
 
+// Shorthand for type comparisons. If typ is set, will return TRUE or FALSE against that type, or will check against undefined if typ is not passed.
+function is(val,typ) {
+	if (!typ) { return (typeof val != 'undefined'); }
+	if (typ=='fnc'||typ=='function') { return (typeof val == 'function'); }
+	if (typ=='str'||typ=='string') { return (typeof val == 'string'); }
+	if (typ=='obj'||typ=='object') { return (val === Object(val)); }
+	if (typ=='arr'||typ=='array') { 
+		if (Array.isArray) { return Array.isArray(val); }
+		return Object.prototype.toString.call(val) == '[object Array]';
+	}
+}//is()
 
 
 
+
+
+/*  Taken from wiki, etc:
 
 // Instantiate a new DataBridge object using the local language constructs:
   db = new DataBridge({
@@ -109,7 +175,7 @@ function jsonToObj(str) {
      }
      
      
-     /**
+    
 	 * student: {
 	 *	  time: timestamp
 	 *	  loc: {lng:, lat:},
@@ -122,4 +188,7 @@ function jsonToObj(str) {
 	 * ]);
 	 * 
 	 * 
-	 */
+	 
+*/
+
+})();//(DataBridge)()
