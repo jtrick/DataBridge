@@ -1,4 +1,3 @@
-
 (function _DataBridge(){  // Encapsulate scope
 
 
@@ -15,31 +14,31 @@ function DataBridge(obj) {
 	
 	
 	function MongoDb() {
-		var _this = this;
-		
-		_api = {
-			'get': function() {
+		var _this = this,
+			_api = {
+				'get': function() {
+				
+				},
+				'set': function() {
+				
+				},
+				'add': function() {
+				
+				},
+				'rem': function() {
+				
+				},
+				'new': function() {
+				
+				},
+				'del': function() {
+				
+				},
+				'exe': function() {
+				
+				}
+			};
 			
-			},
-			'set': function() {
-			
-			},
-			'add': function() {
-			
-			},
-			'rem': function() {
-			
-			},
-			'new': function() {
-			
-			},
-			'del': function() {
-			
-			},
-			'exe': function() {
-			
-			}
-		};
 	}//MongoDb
 	
 }//DataBridge
