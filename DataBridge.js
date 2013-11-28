@@ -4,35 +4,49 @@
 // The js version of the DataBridge object. Pass object parameters as {host:host,data:data,user:user,pass:pass}
 function DataBridge(obj) {
 	if (!(obj=jsonToObj(obj)) { return; }
-	var host = obj.host || 'local',  // Defaults to whatever the preferred context may be. Could be 'localhost', './', 'http://...'.
+	var _this = this,
+		host = obj.host || 'local',  // Defaults to whatever the preferred context may be. Could be 'localhost', './', 'http://...'.
 		data = obj.data || 'default',  // Typically a database name, but could also be any number of other options.
 		user = obj.user || 'default',  // The user authentication identifier to be used to reference access privilages, if applicable. 
 		pass = obj.pass || 'default',  // The authentication password used for the user, if applicable.
 		type = obj.type || 'mongo',  // If specifying a database type. Would typically be inferred from other data?
 		db = getDB(),  // Authenticate and instantiate correct database type.
 		_api = {  // API functions.
-				'get': function() {
-				
+				'get': function(key,val) {
+					db.api({cmd:'get',key:key,val:val});
 				},
-				'set': function() {
-				
+				'set': function(key,val) {
+					db.api({cmd:'set',key:key,val:val});
 				},
-				'add': function() {
-				
+				'add': function(key,val) {
+					db.api({cmd:'add',key:key,val:val});
 				},
-				'rem': function() {
-				
+				'rem': function(key,val) {
+					db.api({cmd:'rem',key:key,val:val});
 				},
-				'new': function() {
-				
+				'new': function(key,val) {
+					db.api({cmd:'new',key:key,val:val});
 				},
-				'del': function() {
-				
+				'del': function(key,val) {
+					db.api({cmd:'del',key:key,val:val});
 				},
-				'exe': function() {
-				
+				'exe': function(key,val) {
+					db.api({cmd:'exe',key:key,val:val});
 				}
 			};//{_api}
+	
+	
+	// Initialize the DataBridge object.
+	(function initDataBridge(){
+		_this.api = apiCall;
+		for (var cmd in _api) { _this[cmd] = _api[cmd]; }
+	})();//(initDataBridge)()
+			
+			
+	// Makes the actual API call to the db abstraction interface.
+	function apiCall(callObj){
+		return db.api(callObj);
+	}
 	
 	
 	// Resolves authentication and instantiation of the correct type of db interface.
@@ -53,35 +67,38 @@ function DataBridge(obj) {
 		var _this = this,
 			_api = {  // API functions.
 				'get': function() {
-				
+					
 				},
 				'set': function() {
-				
+					
 				},
 				'add': function() {
-				
+					
 				},
 				'rem': function() {
-				
+					
 				},
 				'new': function() {
-				
+					
 				},
 				'del': function() {
-				
+					
 				},
 				'exe': function() {
-				
+					
 				}
 			},//{_api}
 			db;  // Overrides local reference to db var, which in this case now represents the actual mongodb instance used within this object.
 			
 			
 			// Initialize the db connection using the 'global' authentication variables.
-			(function init(){
+			(function initMongoDb(){
 				// Fix. Initialize mongodb connection using these items:
 				// db = mongo(host,data,user,pass);
-			})();//(init)()
+				
+				_this.api = apiCall;
+				for (var cmd in _api) { _this[cmd] = _api[cmd]; }
+			})();//(initMongoDb)()
 			
 	}//MongoDb
 	
