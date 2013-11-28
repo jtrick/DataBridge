@@ -8,15 +8,9 @@ function DataBridge(obj) {
 		data = obj.data || 'default',  // Typically a database name, but could also be any number of other options.
 		user = obj.user || 'default',  // The user authentication identifier to be used to reference access privilages, if applicable. 
 		pass = obj.pass || 'default',  // The authentication password used for the user, if applicable.
-		type = obj.type || 'mongo',
-		db = getDB();  // If specifying a database type. Would typically be inferred from other data?
-	
-	// ... Authenticate and instantiate correct database type.
-	
-	
-	function MongoDb() {
-		var _this = this,
-			_api = {
+		type = obj.type || 'mongo',  // If specifying a database type. Would typically be inferred from other data?
+		db = getDB(),  // Authenticate and instantiate correct database type.
+		_api = {  // API functions.
 				'get': function() {
 				
 				},
@@ -38,7 +32,56 @@ function DataBridge(obj) {
 				'exe': function() {
 				
 				}
-			};
+			};//{_api}
+	
+	
+	// Resolves authentication and instantiation of the correct type of db interface.
+	function getDB() {
+		if (!type) { getDbType(); }
+		if (type=='mongo') { return new MongoDb(); }
+		
+		// Identifies db type if not specified.
+		function getDbType() {
+			// Fix. Do something functional to infer correct db type...
+			return type='mongo';
+		}//getDbType()
+	}//getDB()
+	
+	
+	// Instantiates a persistent authenticated mongodb connection to a specific database for a particular user.
+	function MongoDb() {
+		var _this = this,
+			_api = {  // API functions.
+				'get': function() {
+				
+				},
+				'set': function() {
+				
+				},
+				'add': function() {
+				
+				},
+				'rem': function() {
+				
+				},
+				'new': function() {
+				
+				},
+				'del': function() {
+				
+				},
+				'exe': function() {
+				
+				}
+			},//{_api}
+			db;  // Overrides local reference to db var, which in this case now represents the actual mongodb instance used within this object.
+			
+			
+			// Initialize the db connection using the 'global' authentication variables.
+			(function init(){
+				// Fix. Initialize mongodb connection using these items:
+				// db = mongo(host,data,user,pass);
+			})();//(init)()
 			
 	}//MongoDb
 	
