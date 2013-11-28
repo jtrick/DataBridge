@@ -8,7 +8,8 @@ function DataBridge(obj) {
 		data = obj.data || 'default',  // Typically a database name, but could also be any number of other options.
 		user = obj.user || 'default',  // The user authentication identifier to be used to reference access privilages, if applicable. 
 		pass = obj.pass || 'default',  // The authentication password used for the user, if applicable.
-		type = obj.type || 'mongo';  // If specifying a database type. Would typically be inferred from other data?
+		type = obj.type || 'mongo',
+		db = getDB();  // If specifying a database type. Would typically be inferred from other data?
 	
 	// ... Authenticate and instantiate correct database type.
 	
