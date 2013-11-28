@@ -1,193 +1,94 @@
-(function _DataBridge(){  // Encapsulate scope
-
-
-// The js version of the DataBridge object. Pass object parameters as {host:host,data:data,user:user,pass:pass}
-function DataBridge(obj) {
-	if (!(obj=jsonToObj(obj)) { return; }
-	var host = obj.host || 'local',  // Defaults to whatever the preferred context may be. Could be 'localhost', './', 'http://...'.
-		data = obj.data || 'default',  // Typically a database name, but could also be any number of other options.
-		user = obj.user || 'default',  // The user authentication identifier to be used to reference access privilages, if applicable. 
-		pass = obj.pass || 'default',  // The authentication password used for the user, if applicable.
-		type = obj.type || 'mongo',
-		db = getDB();  // If specifying a database type. Would typically be inferred from other data?
+(function () {
 	
-	// ... Authenticate and instantiate correct database type.
+	function is(val,typ) {
+        if (!typ) return (typeof val != 'undefined');
+        if (typ=='fnc'||typ=='function') return (typeof val == 'function');
+        if (typ=='str'||typ=='string') return (typeof val == 'string');
+        if (typ=='obj'||typ=='object') return (val === Object(val));
+        if (typ=='arr'||typ=='array') { 
+			if (Array.isArray) return Array.isArray(val);
+			return Object.prototype.toString.call(val) == '[object Array]';
+        }
+	}
 	
+	function jsonToObj(str) {
+		if (!is(str,'str')) { return str; }
+            var b = str.charAt(0),
+                e = str.charAt(str.length-1),
+                obj;
+            // Fix. Complete these checks:
+            // if (!(b=='{'&&e=='}')&&!(b=='['&&e==']')) { return; }
+		if (b=='[' && e==']') { 
+			obj = JSON.parse('{"tmp":'+str+'}');
+			if (obj && obj.tmp) { return obj.tmp; }
+			return;  // flagError('Invalid JSON str', str);
+         } else if (b=='{' && e=='}') { 
+                obj = JSON.parse(str);
+         } else { 
+                return;  // flagError('Invalid JSON str', str);
+         }
+         return is(obj,'obj') ? obj : str;		
+	}
 	
-	function MongoDb() {
-		var _this = this,
-			_api = {
-				'get': function() {
-				
+	function extend() {
+		for (var i = 1, n = arguments.length, i < n; ++i) {
+			for (var key in arguments[i]) {
+				arguments[0][key] = arguments[i][key];
+			}
+		}
+	
+		return arguments[0];
+	}	
+	
+	var _bridge = Object.freeze({
+		"mongo": function (conn) {
+			var db = require("mongodb").MongoClient("mongodb://%{host}s/%{database}s");
+			
+			return {
+				"get": function (k, v) {
+					return db.collection.find({k:v});
 				},
-				'set': function() {
-				
+				"set": function (k, v, set) {
+					return db.collection.update({k, v}, $set:set);
 				},
-				'add': function() {
-				
+				"rem": function () {
+					
 				},
-				'rem': function() {
-				
+				"new": function () {
+					return db.collection.insert(arguments[0]);
 				},
-				'new': function() {
-				
+				"delete": function () {
+					
 				},
-				'del': function() {
-				
-				},
-				'exe': function() {
-				
+				"exe": function () {
+					
 				}
 			};
-			
-	}//MongoDb
-	
-}//DataBridge
-
-
-
-// *******  Utility Functions:  ************************************************************* //
-
-
-
-// Performs basic checks for JSON structure and returns the extracted object if applicable, returns the original string otherwise.
-function jsonToObj(str) {
-	if (!is(str,'str')) { return str; }
-	var b = str.charAt(0),
-		e = str.charAt(str.length-1),
-		obj;
-	// Fix. Complete these checks:
-	// if (!(b=='{'&&e=='}')&&!(b=='['&&e==']')) { return; }
-	if (b=='[' && e==']') { 
-		obj = JSON.parse('{"tmp":'+str+'}');
-		if (obj && obj.tmp) { return obj.tmp; }
-		return;  // flagError('Invalid JSON str', str);
-	} else if (b=='{' && e=='}') { 
-		obj = JSON.parse(str);
-	} else { 
-		return;  // flagError('Invalid JSON str', str);
-	}
-	return is(obj,'obj') ? obj : str;
-}
-
-
-// Shorthand for type comparisons. If typ is set, will return TRUE or FALSE against that type, or will check against undefined if typ is not passed.
-function is(val,typ) {
-	if (!typ) { return (typeof val != 'undefined'); }
-	if (typ=='fnc'||typ=='function') { return (typeof val == 'function'); }
-	if (typ=='str'||typ=='string') { return (typeof val == 'string'); }
-	if (typ=='obj'||typ=='object') { return (val === Object(val)); }
-	if (typ=='arr'||typ=='array') { 
-		if (Array.isArray) { return Array.isArray(val); }
-		return Object.prototype.toString.call(val) == '[object Array]';
-	}
-}//is()
-
-
-
-
-
-/*  Taken from wiki, etc:
-
-// Instantiate a new DataBridge object using the local language constructs:
-  db = new DataBridge({
-    'host': 'host_uri',  // Defaults to whatever the preferred context may be. Could be 'localhost', './', 'http://...'.
-    'data': 'data_source',  // Typically a database name, but could also be any number of other options.
-    'user': 'user',  // The user authentication identifier to be used to reference access privilages, if applicable. 
-    'pass': 'pass'  // The authentication password used for the user, if applicable.
-  });
-
-// Which obviously could actually look like this:
-  db = new DataBridge({host:host,data:data,user:user,pass:pass});  // Or whatever...
-
-
-// Instantiate a new DataBridge object using a JSON string:
-  db = new DataBridge('{
-    "host" : "host_uri",
-    "data" : "data_source",
-    "user" : "user",
-    "pass" : "pass"
-  }');
-
-// Which obviously could actually look like this:
-  db = new DataBridge(loginString);  // Or whatever...
-
-
-=== Access: ===
-// Obtain data from an authenticated DataBridge object instance. Compare to the to the following SQL statement:
-  SELECT "field1", "field2", "field3", "field4"
-      FROM "table"
-      WHERE "field1"="filterVal",
-        "field2" >= "filterVal",
-        "field3" < "filterVal",
-        "field4" != "filterVal"
-      ORDER BY "field1", "field2", "field3", "field4";
-
-
-// Typical standard usage.
-  db.get('{
-    "table": {
-      "field1": "filterVal",
-      "field2": ">=filterVal",
-      "field3": "<filterVal",
-      "field4": "!filterVal"
-    }
-  }');
-
-
-// Implicit Join:
-	db.get('{
-		"Table1": {
-			"Field1" : "Val1"
 		},
-		"Table2": [
-			"joinField1",
-			"joinField1"
-		]
-	}');
+		"sql": function (conn) {
+		
+		},
+		"postgres": function () {
+	
+		},
+		"redis": function () {
+	
+		}
+	});
+	
+	function DataBridge(kwargs) {
+		if (!(kwargs = jsonToObj(kwargs))) return;
+		
+		var conn = extend({
+			"driver"  : "",	// database type
+			"username": "",	// user authentication
+			"password": "",	// authentication password		
+			"host"    : "",	// location of database instance
+			"port"    : "",	// port where the instance is listening
+			"database": ""	// name of the database
+		}, kwargs);
 
+		return new _bridge[kwargs.driver](conn);
+	}
 
-
-
-
-// Ordered key-val set:
-
-    {[
-        "key1":"val1",
-        "anotherKey":"keyVal"
-     ]}
-    
-// ==> Becomes:
-
-    [
-        {"key1":"val1"},
-        {"anotherKey":"keyVal"}
-    ]
-
-     {
-        "_index_" : [
-            "key1",
-            "anotherKey"
-        ],
-        "key1":"val1",
-        "anotherKey":"keyVal"
-     }
-     
-     
-    
-	 * student: {
-	 *	  time: timestamp
-	 *	  loc: {lng:, lat:},
-	 *	  ip: 0.0.0.0,
-	 * }
-	 * 
-	 * db.student.aggregate([
-	 *	  {$project:{ time: 1, loc: 1, ip: 0 }}, // somthing like this 
-	 *	  {$group: blah blah}
-	 * ]);
-	 * 
-	 * 
-	 
-*/
-
-})();//(DataBridge)()
+})();
